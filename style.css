@@ -3689,6 +3689,7 @@ cursor: pointer;
 
 .internship-title-area {
   flex: 1;
+  min-width: 0;
 }
 
 .internship-title {
@@ -4126,6 +4127,6 @@ cursor: pointer;
   z-index: 0;
 }
 
-#home-section, #explore-section, #hackathons-section, #internships-section {
+#home-section, #explore-section, #hackathons-section, #internships-section, #placements-section {
   width: 100%;
 }

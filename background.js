@@ -198,6 +198,40 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // async
   }
   
+  if (request.action === 'fetchPlacements') {
+    const page = request.page || 1;
+    let fetches = [
+      fetchWithTimeout(`https://unstop.com/api/public/opportunity/search-result?opportunity=jobs&page=${page}`, 8000).then(r => {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      }),
+      fetchWithTimeout(`https://internshala.com/jobs/page-${page}/`, 8000).then(r => {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.text();
+      })
+    ];
+    
+    if (page === 1) {
+      fetches.push(
+        fetchWithTimeout(`https://raw.githubusercontent.com/SimplifyJobs/New-Grad-Positions/dev/README.md`, 8000).then(r => {
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          return r.text();
+        })
+      );
+    }
+    
+    Promise.allSettled(fetches).then(results => {
+      const unstop = results[0].status === 'fulfilled' ? results[0].value : { error: results[0].reason ? results[0].reason.toString() : "Unknown Error" };
+      const internshala = results[1].status === 'fulfilled' ? results[1].value : { error: results[1].reason ? results[1].reason.toString() : "Unknown Error" };
+      const simplify = page === 1 && results[2] && results[2].status === 'fulfilled' ? results[2].value : (page === 1 ? { error: results[2]?.reason?.toString() || "Unknown" } : null);
+      
+      sendResponse({ unstop, internshala, simplify });
+    }).catch(e => {
+      sendResponse({ error: e.toString() });
+    });
+    return true; // async
+  }
+
   if (request.action === 'fetchETNews') {
     fetchWithTimeout('https://economictimes.indiatimes.com/tech/rssfeeds/13357270.cms', 8000)
       .then(r => {

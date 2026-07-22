@@ -2271,6 +2271,7 @@ function init() {
   initShortcuts();
   initExplore();
   initInternships();
+  initPlacements();
   initHackathons();
 
   // Evaluate dynamic profiles on load
@@ -3865,6 +3866,262 @@ function rebuildCustomSelect(select) {
     wrapper.remove();
   }
   initCustomSelects();
+}
+
+let placementsLoaded = false;
+let currentPlacementsPage = 1;
+
+function initPlacements() {
+  const tabPlacements = document.getElementById('tab-placements');
+  const tabPlacementsText = document.getElementById('tab-placements-text');
+  const homeSection = document.getElementById('home-section');
+  const exploreSection = document.getElementById('explore-section');
+  const internshipsSection = document.getElementById('internships-section');
+  const hackathonsSection = document.getElementById('hackathons-section');
+  const placementsSection = document.getElementById('placements-section');
+  
+  const tabExplore = document.getElementById('tab-explore');
+  const tabInternships = document.getElementById('tab-internships');
+  const tabHackathons = document.getElementById('tab-hackathons');
+  
+  const refreshBtn = document.getElementById('refresh-placements-btn');
+
+  if (!tabPlacements || !placementsSection) return;
+
+  tabPlacements.addEventListener('click', () => {
+    const isPlacementsActive = tabPlacements.classList.contains('active');
+    
+    if (tabExplore && tabExplore.classList.contains('active')) {
+      tabExplore.classList.remove('active');
+      document.getElementById('tab-explore-text').textContent = "Explore";
+      exploreSection.classList.add('hidden');
+    }
+    if (tabInternships && tabInternships.classList.contains('active')) {
+      tabInternships.classList.remove('active');
+      document.getElementById('tab-internships-text').textContent = "Internships";
+      internshipsSection.classList.add('hidden');
+    }
+    if (tabHackathons && tabHackathons.classList.contains('active')) {
+      tabHackathons.classList.remove('active');
+      document.getElementById('tab-hackathons-text').textContent = "Hackathons";
+      hackathonsSection.classList.add('hidden');
+    }
+    
+    if (isPlacementsActive) {
+      tabPlacements.classList.remove('active');
+      tabPlacementsText.textContent = "Placements";
+      placementsSection.classList.add('hidden');
+      homeSection.classList.remove('hidden');
+      homeSection.style.animation = 'fadeInUp 0.3s ease-out';
+    } else {
+      tabPlacements.classList.add('active');
+      tabPlacementsText.textContent = "Home";
+      homeSection.classList.add('hidden');
+      placementsSection.classList.remove('hidden');
+      placementsSection.style.animation = 'fadeInUp 0.3s ease-out';
+      
+      if (!placementsLoaded) {
+        currentPlacementsPage = 1;
+        fetchPlacements(false, false, 1);
+      }
+    }
+  });
+
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+      currentPlacementsPage = 1;
+      fetchPlacements(true, false, 1);
+    });
+  }
+
+  const loadMoreBtn = document.getElementById('load-more-placements-btn');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', () => {
+      currentPlacementsPage++;
+      fetchPlacements(false, true, currentPlacementsPage);
+    });
+  }
+
+  const seeLessBtn = document.getElementById('see-less-placements-btn');
+  if (seeLessBtn) {
+    seeLessBtn.addEventListener('click', () => {
+      currentPlacementsPage = 1;
+      const grid = document.getElementById('placements-grid');
+      const allCards = Array.from(grid.children);
+      const toKeep = allCards.slice(0, 15);
+      grid.innerHTML = '';
+      toKeep.forEach(c => grid.appendChild(c));
+      seeLessBtn.classList.add('hidden');
+      placementsSection.scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+}
+
+async function fetchPlacements(forceRefresh = false, append = false, page = 1) {
+  const loading = document.getElementById('placements-loading');
+  const grid = document.getElementById('placements-grid');
+  const controls = document.getElementById('placements-controls');
+  const loadMoreBtn = document.getElementById('load-more-placements-btn');
+  const seeLessBtn = document.getElementById('see-less-placements-btn');
+  
+  if (!append) {
+    loading.style.display = 'flex';
+    grid.innerHTML = '';
+    controls.classList.add('hidden');
+  } else {
+    loadMoreBtn.textContent = 'Loading...';
+    loadMoreBtn.disabled = true;
+  }
+
+  try {
+    const data = await new Promise((resolve) => {
+      chrome.runtime.sendMessage({ action: 'fetchPlacements', page: page }, response => {
+        resolve(response || { unstop: null, internshala: null, simplify: null });
+      });
+    });
+
+    let pageResults = [];
+
+    // Process Unstop
+    if (data && data.unstop && data.unstop.data && data.unstop.data.data) {
+      const unstopJobs = data.unstop.data.data.map(job => ({
+        name: job.title,
+        company: { name: job.organisation ? job.organisation.name : 'Unknown' },
+        publication_date: job.updated_at || new Date().toISOString(),
+        locations: job.jobDetail && job.jobDetail.locations ? job.jobDetail.locations.map(l => ({name: l})) : [],
+        refs: { landing_page: job.seo_url || `https://unstop.com/${job.public_url}` },
+        source: 'Unstop'
+      }));
+      pageResults = pageResults.concat(unstopJobs);
+    }
+
+    // Process Internshala
+    if (data && data.internshala) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(data.internshala, 'text/html');
+      const internshalaNodes = doc.querySelectorAll('.individual_internship');
+      const internshalaJobs = Array.from(internshalaNodes).map(node => {
+        const titleEl = node.querySelector('.job-title-href');
+        const companyEl = node.querySelector('.company-name');
+        const locEls = node.querySelectorAll('.locations a');
+        const locs = Array.from(locEls).map(el => el.textContent.trim());
+        return {
+          name: titleEl ? titleEl.textContent.trim() : 'Placement',
+          company: { name: companyEl ? companyEl.textContent.trim() : 'Unknown' },
+          publication_date: new Date().toISOString(),
+          locations: locs.map(l => ({name: l})),
+          refs: { landing_page: titleEl ? `https://internshala.com${titleEl.getAttribute('href')}` : 'https://internshala.com' },
+          source: 'Internshala'
+        };
+      });
+      pageResults = pageResults.concat(internshalaJobs);
+    }
+    
+    // Process Simplify New Grad
+    if (data && data.simplify) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(data.simplify, 'text/html');
+      const rows = doc.querySelectorAll('tbody tr');
+      let currentCompany = 'Unknown';
+      
+      const simplifyJobs = [];
+      rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length >= 4) {
+          const companyText = cells[0].textContent.trim();
+          if (companyText && companyText !== '↳') {
+            currentCompany = companyText;
+          }
+          
+          const role = cells[1].textContent.trim();
+          const locationText = cells[2].textContent.trim();
+          const linkNode = cells[3].querySelector('a');
+          
+          if (linkNode && linkNode.href) {
+            simplifyJobs.push({
+              name: role,
+              company: { name: currentCompany },
+              publication_date: new Date().toISOString(),
+              locations: [{ name: locationText }],
+              refs: { landing_page: linkNode.href },
+              source: 'Simplify'
+            });
+          }
+        }
+      });
+      
+      pageResults = pageResults.concat(simplifyJobs);
+    }
+
+    pageResults.sort(() => Math.random() - 0.5);
+
+    if (!append) grid.innerHTML = '';
+
+    if (pageResults.length === 0 && !append) {
+      grid.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1;">No placements found.</p>';
+    } else {
+      pageResults.forEach(job => {
+        const card = document.createElement('div');
+        card.className = 'internship-card';
+
+        const companyName = job.company && job.company.name ? job.company.name : 'Unknown Company';
+        
+        let fallbackLogo = 'icons/icon48.png';
+        let logoStyle = 'object-fit: cover;';
+        
+        if (job.source) {
+          if (job.source === 'Unstop') fallbackLogo = 'https://www.google.com/s2/favicons?domain=unstop.com&sz=128';
+          else if (job.source === 'Internshala') fallbackLogo = 'https://internshala.com/favicon.ico';
+          else if (job.source === 'Simplify') fallbackLogo = 'https://simplify.jobs/favicon.ico';
+          logoStyle = 'object-fit: contain; background: white; padding: 4px;';
+        }
+        
+        const locations = job.locations && job.locations.length > 0 
+          ? job.locations.slice(0, 2).map(l => l.name).join(' • ') + (job.locations.length > 2 ? ' ...' : '')
+          : 'Remote / Unknown';
+
+        card.innerHTML = `
+          <div class="internship-header">
+            <img src="${fallbackLogo}" alt="${job.source}" class="company-logo" style="${logoStyle}">
+            <div class="internship-title-area">
+              <h3 class="internship-title">${job.name}</h3>
+              <div class="internship-company">${companyName}</div>
+            </div>
+          </div>
+          <div class="internship-meta">
+            <div class="internship-meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span>${locations}</span>
+            </div>
+            <div class="internship-meta-item">
+              <span>Source: ${job.source || 'Aggregator'}</span>
+            </div>
+          </div>
+          <a href="${job.refs.landing_page}" target="_blank" rel="noopener" class="apply-btn">View Job</a>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    placementsLoaded = true;
+    controls.classList.remove('hidden');
+    
+    if (page > 1) {
+      seeLessBtn.classList.remove('hidden');
+    }
+
+  } catch (err) {
+    console.error('Error fetching placements:', err);
+    if (!append) {
+      grid.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1;">Failed to load placements.</p>';
+    }
+  } finally {
+    if (!append) loading.style.display = 'none';
+    else {
+      loadMoreBtn.textContent = 'Load More';
+      loadMoreBtn.disabled = false;
+    }
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
