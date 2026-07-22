@@ -22,7 +22,8 @@
     "https://internshala.com/*",
     "https://raw.githubusercontent.com/*",
     "https://economictimes.indiatimes.com/*",
-    "https://www.thehindu.com/*"
+    "https://www.thehindu.com/*",
+    "https://devpost.com/*"
   ],
   "background": {
     "service_worker": "background.js"

@@ -240,8 +240,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     Promise.allSettled(fetches).then(results => {
       const unstop = results[0].status === 'fulfilled' ? results[0].value : { error: results[0].reason ? results[0].reason.toString() : "Unknown Error" };
-      const devpost = page === 1 && results[1] && results[1].status === 'fulfilled' ? results[1].value : (page === 1 ? { error: results[1]?.reason?.toString() || "Unknown" } : null);
+      let devpost = page === 1 && results[1] && results[1].status === 'fulfilled' ? results[1].value : (page === 1 ? { error: results[1]?.reason?.toString() || "Unknown" } : null);
       
+      if (devpost && devpost.hackathons) {
+        devpost.hackathons = devpost.hackathons.filter(h => {
+          let prize = 0;
+          if (h.prize_amount) {
+            prize = parseInt(h.prize_amount.replace(/[^0-9]/g, ''), 10) || 0;
+          }
+          const isHighPrize = prize > 5000;
+          const isMLH = h.themes && h.themes.some(t => t.name.toLowerCase().includes('mlh'));
+          const isMajor = h.title && h.title.toLowerCase().includes('mlh');
+          return isHighPrize || isMLH || isMajor;
+        });
+      }
+
       sendResponse({ unstop, devpost });
     }).catch(e => {
       sendResponse({ error: e.toString() });
