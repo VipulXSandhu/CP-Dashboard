@@ -4130,3 +4130,153 @@ cursor: pointer;
 #home-section, #explore-section, #hackathons-section, #internships-section, #placements-section {
   width: 100%;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   QUICK TOOLS SIDEBAR
+───────────────────────────────────────────────────────────────────────────── */
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 400px;
+  height: 100vh;
+  background: var(--bg-card);
+  border-left: 1px solid var(--border-widget);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.sidebar.open {
+  right: 0;
+}
+
+.sidebar-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-widget);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+}
+
+.sidebar-content {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Tool Widgets */
+.tool-widget {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-widget);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+[data-theme="light"] .tool-widget {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.tool-widget h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-primary);
+}
+
+/* Base Converter */
+.input-group {
+  margin-bottom: 12px;
+}
+.input-group:last-child {
+  margin-bottom: 0;
+}
+.input-group label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+/* Typing Warmup */
+.typing-container {
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-widget);
+}
+#typing-text {
+  font-family: monospace;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+  user-select: none;
+}
+#typing-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--border-widget);
+  color: var(--text-primary);
+  font-family: monospace;
+  font-size: 0.95rem;
+  padding: 4px 0;
+  outline: none;
+  transition: border-color 0.2s;
+}
+#typing-input:focus {
+  border-color: var(--accent-blue);
+}
+.badge {
+  background: var(--accent-blue);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Form Inputs used across sidebar */
+.form-input {
+  width: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-widget);
+  color: var(--text-primary);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus {
+  border-color: var(--accent-blue);
+}
+
+@media (max-width: 500px) {
+  .sidebar {
+    width: 100%;
+    right: -100%;
+  }
+}

@@ -288,6 +288,11 @@
           </button>
         </div>
         <div class="top-bar-controls">
+          <button class="theme-btn" id="toggle-tools" title="Quick Tools">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+            </svg>
+          </button>
           <button class="theme-btn" id="toggle-theme" title="Toggle Theme">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="moon-icon">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -740,6 +745,10 @@
     </div> <!-- /home-section -->
 
     <!-- Explore Section (Hidden by default) -->
+    <div id="settings-modal" class="modal hidden">
+      <div class="modal-content">
+      </div>
+    </div>
     <div id="explore-section" class="hidden">
       <div class="explore-header">
         <h2>Developer News</h2>
@@ -858,8 +867,70 @@
     <footer class="footer">
       <p>CP Dashboard &middot; Built for competitive programmers</p>
     </footer>
-  </main>
+    <!-- Quick Tools Sidebar -->
+    <div id="tools-sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <h2>Quick Tools</h2>
+        <button id="close-tools" class="theme-btn" title="Close Tools">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="sidebar-content">
+        <!-- 1. Typing Warmup -->
+        <div class="tool-widget">
+          <h3>Typing Warmup <span id="wpm-display" class="badge">0 WPM</span></h3>
+          <div class="typing-container">
+            <div id="typing-text">for(int i = 0; i < n; i++) { cin >> a[i]; }</div>
+            <input type="text" id="typing-input" autocomplete="off" placeholder="Type here to start..." spellcheck="false">
+          </div>
+          <button id="reset-typing" class="secondary-btn small-btn">Reset</button>
+        </div>
 
-  <script src="script.js"></script>
+        <!-- 2. Base Converter -->
+        <div class="tool-widget">
+          <h3>Base Converter</h3>
+          <div class="input-group">
+            <label>Decimal</label>
+            <input type="number" id="base-dec" class="form-input">
+          </div>
+          <div class="input-group">
+            <label>Binary</label>
+            <input type="text" id="base-bin" class="form-input">
+          </div>
+          <div class="input-group">
+            <label>Hexadecimal</label>
+            <input type="text" id="base-hex" class="form-input">
+          </div>
+        </div>
+
+        <!-- 3. Template Manager -->
+        <div class="tool-widget">
+          <h3>Snippet Manager</h3>
+          <select id="snippet-select" class="form-input" style="margin-bottom: 8px;">
+            <option value="cpp-fastio">C++ Fast I/O</option>
+            <option value="cpp-segtree">C++ Segment Tree</option>
+            <option value="py-sys">Python sys.stdin</option>
+          </select>
+          <textarea id="snippet-code" class="form-input" rows="4" style="font-family: monospace; font-size: 0.85rem;" readonly></textarea>
+          <button id="copy-snippet" class="save-btn small-btn" style="width: 100%; margin-top: 8px;">Copy to Clipboard</button>
+        </div>
+
+        <!-- 4. JSON Formatter -->
+        <div class="tool-widget">
+          <h3>JSON Formatter</h3>
+          <textarea id="json-input" class="form-input" rows="3" placeholder="Paste minified JSON here..."></textarea>
+          <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <button id="format-json" class="save-btn small-btn" style="flex: 1;">Format</button>
+            <button id="minify-json" class="secondary-btn small-btn" style="flex: 1;">Minify</button>
+          </div>
+          <textarea id="json-output" class="form-input" rows="4" style="margin-top: 8px; font-family: monospace;" readonly></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    <script src="tools.js"></script>
+  </main>
 </body>
 </html>
