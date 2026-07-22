@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CP Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Animated background particles -->
+  <canvas id="bg-canvas" class="bg-canvas"></canvas>
+
+  <!-- Settings Modal Overlay -->
+  <div class="modal-overlay" id="settings-overlay">
+    <div class="modal" id="settings-modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Your Profiles</h2>
+        <button class="modal-close" id="settings-close" title="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <form class="modal-body" id="settings-form">
+        <h3 style="font-size: 0.9rem; margin-bottom: 12px; margin-top: 0;">Competitive Programming</h3>
+        <div class="form-group">
+          <label class="form-label" for="cf-handle">
+            <img src="icons/cf-logo.svg" class="form-label-icon" alt="CF">
+            Codeforces Handle
+          </label>
+          <input type="text" class="form-input" id="cf-handle" placeholder="e.g. tourist" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="lc-handle">
+            <img src="icons/lc-logo.svg" class="form-label-icon" alt="LC">
+            LeetCode Username
+          </label>
+          <input type="text" class="form-input" id="lc-handle" placeholder="e.g. your_username" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cc-handle">
+            <img src="icons/cc-logo.svg" class="form-label-icon" alt="CC">
+            CodeChef Username
+          </label>
+          <input type="text" class="form-input" id="cc-handle" placeholder="e.g. your_username" autocomplete="off">
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 20px 0;">
+        <h3 style="font-size: 0.9rem; margin-bottom: 12px;">Professional Profile</h3>
+        <div class="form-group">
+          <label class="form-label" for="profile-college">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="form-label-icon"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+            College / University Name
+          </label>
+          <input type="text" class="form-input" id="profile-college" placeholder="e.g. MIT, IIT Delhi" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="profile-year">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="form-label-icon"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            Year of Study
+          </label>
+          <input type="text" class="form-input" id="profile-year" placeholder="e.g. 3rd Year B.Tech" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="profile-locations">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="form-label-icon"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            Preferred Locations (comma separated)
+          </label>
+          <input type="text" class="form-input" id="profile-locations" placeholder="e.g. Bengaluru, Gurgaon, London" autocomplete="off">
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">We'll filter the Internships board based on these locations.</p>
+        </div>
+        <div class="form-group lock-section">
+          <div class="lock-controls">
+            <button type="button" class="lock-btn" id="lock-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="lock-icon">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span id="lock-btn-text">Lock Profiles</span>
+            </button>
+            <span class="lock-status" id="lock-status">Status: Unlocked</span>
+          </div>
+          <div class="unlock-prompt hidden" id="unlock-prompt">
+            <p id="unlock-prompt-text" style="margin-bottom: 8px; font-size: 0.85rem; color: var(--text-secondary);">Enter password:</p>
+            <div style="display: flex; gap: 10px;">
+              <input type="password" class="form-input" id="unlock-input" placeholder="Password" autocomplete="off" style="margin-bottom: 0;">
+              <button type="button" class="unlock-confirm-btn" id="unlock-confirm-btn">Confirm</button>
+            </div>
+          </div>
+        </div>
+        <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 20px 0;">
+        <h3 style="font-size: 0.9rem; margin-bottom: 12px;">Clock Settings</h3>
+        <div class="form-group" style="display: flex; gap: 12px; margin-bottom: 16px;">
+          <div style="flex: 1;">
+            <label class="form-label" for="digital-clock-style">Digital Style</label>
+            <select class="form-input" id="digital-clock-style" style="margin-bottom: 0;">
+              <option value="default">3D Blue (Default)</option>
+              <option value="minimal">Minimal Flat</option>
+              <option value="neon">Cyberpunk Neon</option>
+              <option value="glass">Glassmorphism</option>
+              <option value="arcade">Retro Arcade</option>
+              <option value="sunset">Sunset Gradient</option>
+              <option value="outline">Monochrome Outline</option>
+              <option disabled>── Layouts ──</option>
+              <option value="flip">Flip Clock Card</option>
+              <option value="stacked">Vertical Stacked</option>
+              <option value="tech">Tech Dashboard Grid</option>
+              <option disabled>── Unique ──</option>
+              <option value="lcd">Retro LCD Device</option>
+              <option value="cyber">Cyber Hacker Matrix</option>
+              <option value="led">LED Panel Display</option>
+            </select>
+          </div>
+          <div style="flex: 1;">
+            <label class="form-label" for="analog-clock-style">Analog Style</label>
+            <select class="form-input" id="analog-clock-style" style="margin-bottom: 0;">
+              <option value="default">Realistic 3D (Default)</option>
+              <option value="minimal">Modern Minimal</option>
+              <option value="neon">Hologram Neon</option>
+              <option value="glass">Frosted Glass</option>
+              <option value="luxury">Gold Luxury</option>
+              <option value="stealth">Stealth Dark</option>
+              <option value="radar">Retro Radar</option>
+              <option value="snake">Serpent</option>
+              <option disabled>── Layouts ──</option>
+              <option value="square">Square Card</option>
+              <option value="ring">Orbiting Dots</option>
+              <option value="hollow">Wireframe Hollow</option>
+              <option value="pendulum">Classic Pendulum</option>
+              <option disabled>── Unique ──</option>
+              <option value="speedometer">Dashboard Speedometer</option>
+              <option value="skeleton">Exposed Gear Skeleton</option>
+              <option value="circuit">Circuit Board</option>
+              <option value="nautical">Nautical Anchor</option>
+              <option value="serpent">Serpent Roman</option>
+              <option value="cubes">3D Floating Cubes</option>
+              <option value="lunar">Celestial Lunar</option>
+            </select>
+          </div>
+        </div>
+        
+        <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 20px 0;">
+        <h3 style="font-size: 0.9rem; margin-bottom: 12px;">Wallpaper Settings</h3>
+        <div class="form-group" style="display: flex; gap: 12px; margin-bottom: 16px;">
+          <div style="flex: 1;">
+            <label class="form-label" for="light-wallpaper-style">Light Mode</label>
+            <select class="form-input" id="light-wallpaper-style" style="margin-bottom: 0;">
+              <option value="dynamic-default">Hacker Blue Symbols (Dynamic)</option>
+              <option value="dynamic-nodes">Floating Nodes (Dynamic)</option>
+              <option value="dynamic-bubbles">Rising Bubbles (Dynamic)</option>
+              <option value="dynamic-waves">Flowing Waves (Dynamic)</option>
+              <option value="static-gradient">Soft Gradient (Static)</option>
+              <option value="static-topography">Abstract Topography (Static)</option>
+            </select>
+          </div>
+          <div style="flex: 1;">
+            <label class="form-label" for="dark-wallpaper-style">Dark Mode</label>
+            <select class="form-input" id="dark-wallpaper-style" style="margin-bottom: 0;">
+              <option value="dynamic-default">Constellations (Dynamic)</option>
+              <option value="dynamic-matrix">Matrix Rain (Dynamic)</option>
+              <option value="dynamic-warp">Warp Speed (Dynamic)</option>
+              <option value="dynamic-snow">Falling Snow (Dynamic)</option>
+              <option value="static-space">Deep Space (Static)</option>
+              <option value="static-cyberpunk">Neon Cyberpunk City (Static)</option>
+            </select>
+          </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 20px 0;">
+        <h3 style="font-size: 0.9rem; margin-bottom: 12px;">Weather Settings</h3>
+        <div class="form-group">
+          <label class="form-label" for="weather-location">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="form-label-icon"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            Location (City Name)
+          </label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" class="form-input" id="weather-location" placeholder="e.g. New Delhi, London, Tokyo" autocomplete="off" style="margin-bottom: 0;">
+            <button type="button" class="save-btn" id="auto-detect-location-btn" style="width: auto; padding: 0 12px; font-size: 0.85rem;" title="Use my exact location">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="3"></circle>
+                <line x1="12" y1="2" x2="12" y2="5"></line>
+                <line x1="12" y1="19" x2="12" y2="22"></line>
+                <line x1="2" y1="12" x2="5" y2="12"></line>
+                <line x1="19" y1="12" x2="22" y2="12"></line>
+              </svg>
+            </button>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 8px;" id="weather-location-hint">Used to display current weather & temperature next to the clock. Click the icon to auto-detect.</p>
+        </div>
+        <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 20px 0;">
+        <h3 style="font-size: 0.9rem; margin-bottom: 12px;">AI Assistant Settings</h3>
+        <div class="form-group">
+          <label class="form-label" for="llm-api-key">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="form-label-icon"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            Gemini API Key
+          </label>
+          <input type="password" class="form-input" id="llm-api-key" placeholder="AIzaSy..." autocomplete="off">
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">Stored securely in local storage.</p>
+        </div>
+
+        <button type="submit" class="save-btn" id="save-profiles">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Save Settings
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Daily Question Reminder Modal Overlay -->
+  <div class="modal-overlay" id="daily-reminder-overlay">
+    <div class="modal" id="daily-reminder-modal" style="max-width: 450px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Daily Reminder 🎯</h2>
+        <button class="modal-close" id="daily-reminder-close" title="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="text-align: center; padding-top: 10px;">
+        <p style="margin-bottom: 24px; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">You haven't completed your daily question today!<br>Don't let your streak break! 🔥</p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+          <button type="button" class="secondary-btn" id="daily-reminder-later" style="padding: 10px 20px; font-size: 0.85rem;">I'll do it later</button>
+          <button type="button" class="save-btn" id="daily-reminder-done" style="width: auto; padding: 10px 20px; margin-top: 0; font-size: 0.85rem;">I've done it!</button>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Chat Modal Overlay -->
+  <div class="modal-overlay" id="ai-chat-overlay">
+    <div class="modal" id="ai-chat-modal" style="max-width: 500px; display: flex; flex-direction: column; height: 60vh;">
+      <div class="modal-header">
+        <h2 class="modal-title">AI Upsolving ✨</h2>
+        <button class="modal-close" id="ai-chat-close" title="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 0;">
+        <div id="ai-chat-messages" style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+          <!-- Chat messages go here -->
+        </div>
+        <form id="ai-chat-form" style="display: flex; gap: 10px; padding: 15px 20px; border-top: 1px solid var(--border-subtle); background: rgba(0,0,0,0.2);">
+          <input type="text" id="ai-chat-input" class="form-input" placeholder="Ask for a hint..." style="margin-bottom: 0;" autocomplete="off">
+          <button type="submit" class="save-btn" style="width: auto; margin-top: 0; padding: 0 16px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <main class="dashboard">
+    <!-- Top Section: Greeting & Clock -->
+    <header class="hero-section">
+      <div class="hero-top-bar" style="position: relative;">
+        <span class="brand-tag">CP Dashboard</span>
+        
+        <!-- Top Centered Navigation Tabs -->
+        <div style="display: flex; align-items: center; justify-content: center; gap: 16px; position: absolute; left: 50%; transform: translateX(-50%);">
+          <button id="tab-explore" class="explore-tab-btn" title="Developer News Feed">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+            <span id="tab-explore-text">Explore</span>
+          </button>
+          <button id="tab-internships" class="explore-tab-btn" title="Software Engineering Internships">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            <span id="tab-internships-text">Internships</span>
+          </button>
+          <button id="tab-hackathons" class="explore-tab-btn" title="Upcoming Hackathons">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            <span id="tab-hackathons-text">Hackathons</span>
+          </button>
+        </div>
+        <div class="top-bar-controls">
+          <button class="theme-btn" id="toggle-theme" title="Toggle Theme">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="moon-icon">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sun-icon" style="display:none;">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+          <button class="settings-btn" id="open-settings" title="Profile Settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px;">
+        <p class="greeting" id="greeting" style="margin-bottom: 0;">Good Evening</p>
+      </div>
+    </header>
+
+    <div id="home-section">
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 25px;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+          <div id="clock-container" title="Click to switch clock style" style="cursor: pointer; position: relative;">
+            <!-- Digital Clock -->
+            <h1 class="clock" id="digital-clock" style="margin-bottom: 0;">00:00:00</h1>
+            <!-- Analog Clock -->
+            <div class="analog-clock hidden" id="analog-clock">
+              <div class="clock-pendulum"></div>
+              
+              <div class="serpent-container">
+                <svg class="snake-svg" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+                  <path id="snake-path" d="M120,20 C175,20 220,65 220,120 C220,175 175,220 120,220 C65,220 20,175 20,120 C20,65 65,20 120,20 Z" fill="none" />
+                  
+                  <path class="snake-body" d="M120,20 C175,20 220,65 220,120 C220,175 175,220 120,220 C65,220 20,175 20,120 C20,65 65,20 120,20 Z" />
+                  <path class="snake-pattern" d="M120,20 C175,20 220,65 220,120 C220,175 175,220 120,220 C65,220 20,175 20,120 C20,65 65,20 120,20 Z" />
+                  
+                  <g class="snake-head-g">
+                    <animateMotion dur="15s" repeatCount="indefinite" rotate="auto">
+                      <mpath href="#snake-path" />
+                    </animateMotion>
+                    <path d="M-8,-10 L4,-8 L12,0 L4,8 L-8,10 Z" fill="#6ba7a4" stroke="#254a49" stroke-width="1.5" />
+                    <circle cx="4" cy="-4" r="1.5" fill="#f00" />
+                    <circle cx="4" cy="4" r="1.5" fill="#f00" />
+                    <path d="M12,0 L20,-2 L18,0 L20,2 Z" fill="#f00" /> <!-- tongue -->
+                  </g>
+
+                  <!-- Second Snake -->
+                  <path class="snake-body s2" d="M120,20 C175,20 220,65 220,120 C220,175 175,220 120,220 C65,220 20,175 20,120 C20,65 65,20 120,20 Z" />
+                  <path class="snake-pattern s2" d="M120,20 C175,20 220,65 220,120 C220,175 175,220 120,220 C65,220 20,175 20,120 C20,65 65,20 120,20 Z" />
+                  
+                  <g class="snake-head-g" style="animation-delay: -7.5s;">
+                    <animateMotion dur="15s" begin="-7.5s" repeatCount="indefinite" rotate="auto">
+                      <mpath href="#snake-path" />
+                    </animateMotion>
+                    <path d="M-8,-10 L4,-8 L12,0 L4,8 L-8,10 Z" fill="#6ba7a4" stroke="#254a49" stroke-width="1.5" />
+                    <circle cx="4" cy="-4" r="1.5" fill="#f00" />
+                    <circle cx="4" cy="4" r="1.5" fill="#f00" />
+                    <path d="M12,0 L20,-2 L18,0 L20,2 Z" fill="#f00" />
+                  </g>
+                </svg>
+
+                <svg class="serpent-clock-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="100" cy="100" r="85" class="serpent-bg" />
+                  <circle cx="100" cy="100" r="80" class="serpent-inner-bg" />
+                  
+                  <g class="serpent-numerals">
+                    <text x="100" y="38">XII</text>
+                    <text x="131" y="46">I</text>
+                    <text x="154" y="69">II</text>
+                    <text x="162" y="100">III</text>
+                    <text x="154" y="131">IV</text>
+                    <text x="131" y="154">V</text>
+                    <text x="100" y="162">VI</text>
+                    <text x="69" y="154">VII</text>
+                    <text x="46" y="131">VIII</text>
+                    <text x="38" y="100">IX</text>
+                    <text x="46" y="69">X</text>
+                    <text x="69" y="46">XI</text>
+                  </g>
+                </svg>
+              </div>
+
+              <div class="clock-face">
+                <div class="moon-container" id="moon-container" style="display: none;">
+                  <div class="moon-body"></div>
+                  <div class="moon-shadow" id="moon-shadow"></div>
+                </div>
+                <div class="lunar-digital-time" id="lunar-digital-time"></div>
+                <div class="hand hour-hand" id="hour-hand"></div>
+                <div class="hand minute-hand" id="minute-hand"></div>
+                <div class="hand second-hand" id="second-hand"></div>
+                <div class="clock-center"></div>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div id="weather-display" title="Current Weather" class="weather-display">
+              <span id="weather-icon">☀️</span>
+              <span id="weather-temp" class="weather-temp"></span>
+            </div>
+            <div id="weather-smart-tip" style="text-align: center; font-size: 0.75rem; font-weight: 500; color: var(--text-secondary); margin-top: 8px; max-width: 140px; line-height: 1.3;"></div>
+          </div>
+        </div>
+        
+        <p class="date" id="date" style="margin: 10px 0 6px 0; font-size: 1.1rem; color: var(--text-primary); font-weight: 500;">Thursday, July 17, 2026</p>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-bar-wrapper">
+        <form id="search-form" class="search-bar" autocomplete="off">
+          <svg class="search-bar-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="search-input" class="search-input" placeholder="Search the web" autocomplete="off" spellcheck="false">
+          <button type="submit" class="search-submit-btn" title="Search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- Quick Shortcuts -->
+      <div class="shortcuts-row" id="shortcuts-row">
+        <!-- Shortcuts will be rendered here by JS -->
+        <button class="shortcut-add-btn" id="add-shortcut-btn" title="Add shortcut">
+          <div class="shortcut-icon-circle add-circle">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </div>
+          <span class="shortcut-label">Add shortcut</span>
+        </button>
+      </div>
+
+
+    <!-- Add Shortcut Modal -->
+    <div class="modal-overlay" id="shortcut-modal-overlay">
+      <div class="modal" id="shortcut-modal" style="max-width: 400px;">
+        <div class="modal-header">
+          <h2 class="modal-title" id="shortcut-modal-title">Add Shortcut</h2>
+          <button class="modal-close" id="shortcut-modal-close" title="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <form class="modal-body" id="shortcut-form">
+          <div class="form-group">
+            <label class="form-label" for="shortcut-name">Name</label>
+            <input type="text" class="form-input" id="shortcut-name" placeholder="e.g. YouTube" autocomplete="off" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="shortcut-url">URL</label>
+            <input type="url" class="form-input" id="shortcut-url" placeholder="https://youtube.com" autocomplete="off" required>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button type="submit" class="save-btn" id="shortcut-save-btn" style="flex: 1;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Save
+            </button>
+            <button type="button" class="shortcut-delete-btn hidden" id="shortcut-delete-btn" title="Delete this shortcut">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              Delete
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Rating Cards Row -->
+    <section class="ratings-row" id="ratings-row">
+      <!-- Empty State -->
+      <div class="empty-profiles-state hidden" id="empty-profiles-state">
+        <h3 style="margin-bottom: 12px;">No Accounts Connected</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">Connect your Codeforces, LeetCode, or CodeChef accounts to view your stats.</p>
+        <button class="save-btn" id="empty-state-connect-btn" style="width: auto; padding: 10px 24px;">Connect Accounts</button>
+      </div>
+
+      <!-- Codeforces Card -->
+      <div class="rating-card cf-card" data-platform="cf" style="display: none;">
+        <div class="rating-card-header">
+          <div class="platform-badge cf-badge"><img src="icons/cf-logo.svg" alt="Codeforces"></div>
+          <a class="platform-name" id="cf-name-display" target="_blank" rel="noopener" style="text-decoration: none; color: inherit; cursor: pointer;">Codeforces</a>
+        </div>
+        <div class="rating-card-body" id="cf-rating-body">
+          <div class="rating-prompt" id="cf-prompt">
+            <p>Set your handle in</p>
+            <button class="set-handle-btn" data-platform="cf">⚙️ Settings</button>
+          </div>
+          <div class="rating-info hidden" id="cf-info">
+            <div class="rating-number" id="cf-rating">—</div>
+            <div class="rating-rank" id="cf-rank">—</div>
+            <div class="rating-detail">
+              <span class="rating-label">Max</span>
+              <span class="rating-value" id="cf-max-rating">—</span>
+            </div>
+            <div class="rating-detail">
+              <span class="rating-label">Solved</span>
+              <span class="rating-value" id="cf-solved">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LeetCode Card -->
+      <div class="rating-card lc-card" data-platform="lc" style="display: none;">
+        <div class="rating-card-header">
+          <div class="platform-badge lc-badge"><img src="icons/lc-logo.svg" alt="LeetCode"></div>
+          <a class="platform-name" id="lc-name-display" target="_blank" rel="noopener" style="text-decoration: none; color: inherit; cursor: pointer;">LeetCode</a>
+        </div>
+        <div class="rating-card-body" id="lc-rating-body">
+          <div class="rating-prompt" id="lc-prompt">
+            <p>Set your handle in</p>
+            <button class="set-handle-btn" data-platform="lc">⚙️ Settings</button>
+          </div>
+          <div class="rating-info hidden" id="lc-info">
+            <div class="rating-number" id="lc-rating">—</div>
+            <div class="rating-rank" id="lc-rank">—</div>
+            <div class="rating-detail">
+              <span class="rating-label">Contests</span>
+              <span class="rating-value" id="lc-attended">—</span>
+            </div>
+            <div class="rating-detail">
+              <span class="rating-label">Solved</span>
+              <span class="rating-value" id="lc-solved">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CodeChef Card -->
+      <div class="rating-card cc-card" data-platform="cc" style="display: none;">
+        <div class="rating-card-header">
+          <div class="platform-badge cc-badge"><img src="icons/cc-logo.svg" alt="CodeChef"></div>
+          <a class="platform-name" id="cc-name-display" target="_blank" rel="noopener" style="text-decoration: none; color: inherit; cursor: pointer;">CodeChef</a>
+        </div>
+        <div class="rating-card-body" id="cc-rating-body">
+          <div class="rating-prompt" id="cc-prompt">
+            <p>Set your handle in</p>
+            <button class="set-handle-btn" data-platform="cc">⚙️ Settings</button>
+          </div>
+          <div class="rating-info hidden" id="cc-info">
+            <div class="rating-number" id="cc-rating">—</div>
+            <div class="rating-rank" id="cc-rank">—</div>
+            <div class="rating-detail">
+              <span class="rating-label">Max</span>
+              <span class="rating-value" id="cc-max-rating">—</span>
+            </div>
+            <div class="rating-detail">
+              <span class="rating-label">Solved</span>
+              <span class="rating-value" id="cc-solved">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Widgets Grid -->
+    <section class="widgets-grid">
+
+      <!-- Upcoming Contests Widget (Multi-Platform) -->
+      <div class="widget contests-widget">
+        <div class="widget-header">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="widget-icon contests-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            </div>
+            <h2 class="widget-title">Contests</h2>
+          </div>
+          <div class="widget-tabs" style="display: flex; gap: 4px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 8px;">
+            <button class="widget-tab active" id="tab-upcoming">Upcoming</button>
+            <button class="widget-tab" id="tab-past">Past Unsolved</button>
+          </div>
+          <button class="refresh-btn" id="refresh-contests" title="Refresh contests">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="widget-body" id="contests-list">
+          <div class="loading-skeleton">
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- To-Do List Widget -->
+      <div class="widget todo-widget">
+        <div class="widget-header">
+          <div class="widget-icon todo-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <h2 class="widget-title">To-Do List</h2>
+          <span class="todo-count" id="todo-count">0 tasks</span>
+        </div>
+        <form class="todo-input-wrapper" id="todo-form">
+          <input type="text" class="todo-input" id="todo-input" placeholder="Add a new task..." autocomplete="off" maxlength="120">
+          <div class="todo-timer-group">
+            <div class="todo-timer-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <input type="number" class="todo-timer-val" id="todo-timer-val" placeholder="Time" min="0.1" step="any" max="999" title="Timer value (optional)">
+            <div class="todo-timer-divider"></div>
+            <select class="todo-timer-unit" id="todo-timer-unit" title="Timer unit">
+              <option value="m">mins</option>
+              <option value="h">hrs</option>
+              <option value="d" selected>days</option>
+              <option value="w">weeks</option>
+            </select>
+          </div>
+          <button type="submit" class="todo-add-btn" id="todo-add-btn" title="Add task">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </form>
+        <div class="widget-body" style="padding-top: 15px;">
+          <ul class="todo-list" id="todo-list"></ul>
+          <div class="todo-empty" id="todo-empty">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+            </svg>
+            <p>No tasks yet. Add one above!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Links Widget -->
+      <div class="widget links-widget">
+        <div class="widget-header">
+          <div class="widget-icon links-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </div>
+          <h2 class="widget-title">Quick Links</h2>
+        </div>
+        <div class="widget-body quick-links-grid">
+          <a href="https://codeforces.com" class="quick-link" target="_blank" rel="noopener">
+            <div class="link-icon cf-link-icon"><img src="icons/cf-logo.svg" alt="CF"></div>
+            <span>Codeforces</span>
+          </a>
+          <a href="https://cses.fi/problemset/" class="quick-link" target="_blank" rel="noopener">
+            <div class="link-icon cses-link-icon"><img src="icons/cses-logo.svg" alt="CSES" class="invert-in-light"></div>
+            <span>CSES</span>
+          </a>
+          <a href="https://atcoder.jp/contests/" class="quick-link" target="_blank" rel="noopener">
+            <div class="link-icon atcoder-link-icon"><img src="icons/atcoder-logo.svg" alt="AtCoder"></div>
+            <span>AtCoder</span>
+          </a>
+          <a href="https://leetcode.com/problemset/" class="quick-link" target="_blank" rel="noopener">
+            <div class="link-icon lc-link-icon"><img src="icons/lc-logo.svg" alt="LC"></div>
+            <span>LeetCode</span>
+          </a>
+          <a href="https://www.codechef.com/contests" class="quick-link" target="_blank" rel="noopener">
+            <div class="link-icon cc-link-icon"><img src="icons/cc-logo.svg" alt="CC"></div>
+            <span>CodeChef</span>
+          </a>
+          <a href="https://github.com" class="quick-link" target="_blank" rel="noopener">
+            <div class="link-icon gh-link-icon"><img src="icons/github-logo.svg" alt="GH" class="invert-in-light"></div>
+            <span>GitHub</span>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Heat Map Widget (Full Width) -->
+      <div class="widget heatmap-widget">
+        <div class="widget-header heatmap-header">
+          <div class="heatmap-title-group">
+            <div class="widget-icon heatmap-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="3" y1="9" x2="21" y2="9"></line>
+                <line x1="9" y1="21" x2="9" y2="9"></line>
+              </svg>
+            </div>
+            <h2 class="widget-title">Activity Heat Map</h2>
+          </div>
+          <div class="heatmap-controls">
+            <select id="heatmap-year-select" class="heatmap-year-select" title="Select Year">
+              <option value="last_365">Current</option>
+            </select>
+            <button class="heatmap-tab active" data-platform="cf">Codeforces</button>
+            <button class="heatmap-tab" data-platform="lc">LeetCode</button>
+            <button class="heatmap-tab" data-platform="cc">CodeChef</button>
+          </div>
+        </div>
+        <div class="widget-body heatmap-body">
+          <div class="heatmap-header-stats">
+            <div class="heatmap-total-subs"><span id="hm-total">0</span> submissions in the past one year</div>
+            <div class="heatmap-extra-stats">
+              <span>Total active days: <strong id="hm-active">0</strong></span>
+              <span>Max streak: <strong id="hm-streak">0</strong></span>
+            </div>
+          </div>
+          <div class="heatmap-scroll-container">
+            <div id="heatmap-grid" class="heatmap-grid-months">
+              <!-- Grid months generated via JS -->
+            </div>
+          </div>
+          <div class="heatmap-legend">
+            <span>Less</span>
+            <div class="legend-square level-0"></div>
+            <div class="legend-square level-1"></div>
+            <div class="legend-square level-2"></div>
+            <div class="legend-square level-3"></div>
+            <div class="legend-square level-4"></div>
+            <span>More</span>
+          </div>
+        </div>
+      </div>
+      
+    </section>
+    </div> <!-- /home-section -->
+
+    <!-- Explore Section (Hidden by default) -->
+    <div id="explore-section" class="hidden">
+      <div class="explore-header">
+        <h2>Developer News</h2>
+        <p>Top stories in programming, tech, and internships.</p>
+        <button id="refresh-news-btn" class="refresh-news-btn" title="Refresh News">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="news-grid" id="news-grid">
+        <!-- News cards will be injected here -->
+      </div>
+      <div id="news-loading" class="news-loading">
+        <div class="spinner"></div>
+        <p>Loading the latest tech news...</p>
+      </div>
+      <div class="explore-controls hidden" id="explore-controls" style="display: flex; justify-content: center; gap: 16px; margin: 20px 0 40px 0;">
+        <button id="see-less-news-btn" class="secondary-btn hidden" style="padding: 10px 24px;">See Less</button>
+        <button id="load-more-news-btn" class="save-btn" style="width: auto; margin-top: 0; padding: 10px 24px;">Load More</button>
+      </div>
+    </div>
+
+    <!-- Internships Section (Hidden by default) -->
+    <div id="internships-section" class="hidden">
+      <div class="explore-header">
+        <h2 style="background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); -webkit-background-clip: text;">Internships</h2>
+        <p>Latest software engineering and tech internships globally.</p>
+        <div id="internships-filter-indicator" style="display: none; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; font-size: 0.85rem; color: var(--accent-cyan); background: rgba(34, 211, 238, 0.1); padding: 4px 12px; border-radius: 20px; width: fit-content; margin-left: auto; margin-right: auto; border: 1px solid rgba(34, 211, 238, 0.2);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path></svg>
+          <span id="internships-filter-text">Filtered</span>
+        </div>
+        <button id="refresh-internships-btn" class="refresh-news-btn" title="Refresh Internships">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Big Tech & Quant Direct Portals -->
+      <div class="direct-portals-wrapper" style="margin: 0 auto 30px auto; max-width: 1200px; padding: 0 20px;">
+        <h3 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; text-align: left;">Official Career Portals (Not on Aggregators)</h3>
+        <div class="portals-scroll-row" id="portals-row">
+          <!-- Portals injected by JS -->
+        </div>
+      </div>
+
+      <div class="news-grid" id="internships-grid">
+        <!-- Internship cards will be injected here -->
+      </div>
+      <div id="internships-loading" class="news-loading">
+        <div class="spinner"></div>
+        <p>Finding the best internships...</p>
+      </div>
+      <div class="explore-controls hidden" id="internships-controls" style="display: flex; justify-content: center; gap: 16px; margin: 20px 0 40px 0;">
+        <button id="see-less-internships-btn" class="secondary-btn hidden" style="padding: 10px 24px;">See Less</button>
+        <button id="load-more-internships-btn" class="save-btn" style="width: auto; margin-top: 0; padding: 10px 24px;">Load More</button>
+      </div>
+    </div>
+
+    <!-- Hackathons Section (Hidden by default) -->
+    <div id="hackathons-section" class="hidden">
+      <div class="explore-header">
+        <h2 style="background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); -webkit-background-clip: text;">Hackathons</h2>
+        <p>Upcoming hackathons from Devpost and Unstop.</p>
+        <button id="refresh-hackathons-btn" class="refresh-news-btn" title="Refresh Hackathons">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="news-grid" id="hackathons-grid">
+        <!-- Hackathon cards will be injected here -->
+      </div>
+      <div id="hackathons-loading" class="news-loading">
+        <div class="spinner"></div>
+        <p>Finding hackathons...</p>
+      </div>
+      <div class="explore-controls hidden" id="hackathons-controls" style="display: flex; justify-content: center; gap: 16px; margin: 20px 0 40px 0;">
+        <button id="see-less-hackathons-btn" class="secondary-btn hidden" style="padding: 10px 24px;">See Less</button>
+        <button id="load-more-hackathons-btn" class="save-btn" style="width: auto; margin-top: 0; padding: 10px 24px;">Load More</button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>CP Dashboard &middot; Built for competitive programmers</p>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
