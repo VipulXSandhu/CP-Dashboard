@@ -332,6 +332,206 @@
   --shadow-glow-orange: 0 0 40px rgba(250, 179, 135, 0.1);
 }
 
+/* --- Neon Cyberpunk Theme --- */
+[data-theme="neon"] {
+  --bg-primary: #000000;
+  --bg-secondary: #020205;
+  --bg-card: rgba(5, 5, 10, 0.75);
+  --bg-card-hover: rgba(10, 10, 20, 0.95);
+  --bg-input: rgba(10, 5, 20, 0.8);
+
+  --text-primary: #ffffff;
+  --text-secondary: #e0d0ff;
+  --text-muted: #b0a0d0;
+
+  --cf-color: #00ffff;
+  --cf-gradient: linear-gradient(135deg, #00ffff, #9d00ff);
+  --lc-color: #ffaa00;
+  --lc-gradient: linear-gradient(135deg, #ffaa00, #ff007f);
+  --cc-color: #7777aa;
+  --cc-gradient: linear-gradient(135deg, #7777aa, #444477);
+
+  --accent-blue: #00ffff;
+  --accent-purple: #9d00ff;
+  --accent-pink: #ff007f;
+  --accent-green: #00ff00;
+  --accent-orange: #ffaa00;
+  --accent-red: #ff003c;
+  --accent-cyan: #00ffff;
+  --accent-yellow: #ffff00;
+
+  --gradient-hero: linear-gradient(135deg, #9d00ff 0%, #ff007f 50%, #00ffff 100%);
+  --gradient-contest: linear-gradient(135deg, #9d00ff, #00ffff);
+  --gradient-todo: linear-gradient(135deg, #00ff00, #00ffff);
+  --gradient-links: linear-gradient(135deg, #ff007f, #ffaa00);
+
+  --border-subtle: rgba(157, 0, 255, 0.4);
+  --border-widget: rgba(157, 0, 255, 0.6);
+
+  --shadow-card: 0 0 20px rgba(157, 0, 255, 0.15), inset 0 0 10px rgba(157, 0, 255, 0.1);
+  --shadow-glow-blue: 0 0 60px rgba(0, 255, 255, 0.5);
+  --shadow-glow-green: 0 0 60px rgba(0, 255, 0, 0.5);
+  --shadow-glow-orange: 0 0 60px rgba(255, 0, 127, 0.5);
+}
+
+/* Neon Theme — Extreme Glow effects */
+[data-theme="neon"] body {
+  color: #fff;
+  text-shadow: 0 0 5px rgba(255,255,255,0.3);
+}
+
+[data-theme="neon"] h1, [data-theme="neon"] h2, [data-theme="neon"] h3, 
+[data-theme="neon"] .widget-title, [data-theme="neon"] .platform-name, [data-theme="neon"] .clock-time {
+  text-shadow: 0 0 10px var(--accent-purple), 0 0 20px var(--accent-pink);
+}
+
+[data-theme="neon"] .widget {
+  border: 1px solid rgba(157, 0, 255, 0.5);
+  box-shadow: 0 0 15px rgba(157, 0, 255, 0.2), inset 0 0 10px rgba(157, 0, 255, 0.1);
+  transition: all 0.3s ease;
+}
+[data-theme="neon"] .widget:hover {
+  border-color: #9d00ff;
+  box-shadow: 0 0 40px rgba(157, 0, 255, 0.6), 0 0 20px rgba(255, 0, 127, 0.4), inset 0 0 20px rgba(157, 0, 255, 0.3);
+}
+[data-theme="neon"] .contests-widget { border-color: rgba(0, 255, 255, 0.4); box-shadow: 0 0 15px rgba(0, 255, 255, 0.15); }
+[data-theme="neon"] .contests-widget:hover {
+  box-shadow: 0 0 40px rgba(0, 255, 255, 0.6), 0 0 80px rgba(0, 255, 255, 0.3), inset 0 0 30px rgba(0, 255, 255, 0.2);
+  border-color: #00ffff;
+}
+[data-theme="neon"] .todo-widget { border-color: rgba(0, 255, 0, 0.4); box-shadow: 0 0 15px rgba(0, 255, 0, 0.15); }
+[data-theme="neon"] .todo-widget:hover {
+  box-shadow: 0 0 40px rgba(0, 255, 0, 0.6), 0 0 80px rgba(0, 255, 0, 0.3), inset 0 0 30px rgba(0, 255, 0, 0.2);
+  border-color: #00ff00;
+}
+[data-theme="neon"] .links-widget { border-color: rgba(255, 0, 127, 0.4); box-shadow: 0 0 15px rgba(255, 0, 127, 0.15); }
+[data-theme="neon"] .links-widget:hover {
+  box-shadow: 0 0 40px rgba(255, 0, 127, 0.6), 0 0 80px rgba(255, 0, 127, 0.3), inset 0 0 30px rgba(255, 0, 127, 0.2);
+  border-color: #ff007f;
+}
+
+[data-theme="neon"] .rating-card {
+  border: 1px solid rgba(157, 0, 255, 0.4);
+  box-shadow: 0 0 15px rgba(157, 0, 255, 0.15);
+  transition: all 0.3s ease;
+}
+[data-theme="neon"] .cf-card { border-color: rgba(0, 255, 255, 0.3); }
+[data-theme="neon"] .cf-card:hover {
+  box-shadow: 0 0 40px rgba(0, 255, 255, 0.6), 0 0 80px rgba(0, 255, 255, 0.3);
+  border-color: #00ffff;
+}
+[data-theme="neon"] .lc-card { border-color: rgba(255, 170, 0, 0.3); }
+[data-theme="neon"] .lc-card:hover {
+  box-shadow: 0 0 40px rgba(255, 170, 0, 0.6), 0 0 80px rgba(255, 170, 0, 0.3);
+  border-color: #ffaa00;
+}
+[data-theme="neon"] .cc-card { border-color: rgba(157, 0, 255, 0.3); }
+[data-theme="neon"] .cc-card:hover {
+  box-shadow: 0 0 40px rgba(157, 0, 255, 0.6), 0 0 80px rgba(157, 0, 255, 0.3);
+  border-color: #9d00ff;
+}
+
+[data-theme="neon"] .quick-link {
+  border: 1px solid rgba(157, 0, 255, 0.3);
+  box-shadow: 0 0 10px rgba(157, 0, 255, 0.1);
+  transition: all 0.25s ease;
+}
+[data-theme="neon"] .quick-link:hover {
+  box-shadow: 0 0 30px rgba(157, 0, 255, 0.7), 0 0 60px rgba(255, 0, 127, 0.4);
+  border-color: #9d00ff;
+  text-shadow: 0 0 10px #9d00ff;
+}
+
+[data-theme="neon"] .portal-card {
+  border: 1px solid rgba(255, 0, 127, 0.3);
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.1);
+  transition: all 0.3s ease;
+}
+[data-theme="neon"] .portal-card:hover {
+  box-shadow: 0 0 40px rgba(255, 0, 127, 0.6), 0 0 80px rgba(255, 0, 127, 0.3);
+  border-color: #ff007f;
+}
+
+[data-theme="neon"] .contest-item {
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+[data-theme="neon"] .contest-item:hover {
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.6), 0 0 60px rgba(0, 255, 255, 0.3);
+  border-color: #00ffff;
+}
+
+[data-theme="neon"] .todo-item {
+  border: 1px solid rgba(0, 255, 0, 0.2);
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.1);
+  transition: all 0.3s ease;
+}
+[data-theme="neon"] .todo-item:hover {
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.6), 0 0 60px rgba(0, 255, 0, 0.3);
+  border-color: #00ff00;
+}
+
+[data-theme="neon"] .shortcut-item:hover .shortcut-icon-circle {
+  box-shadow: 0 0 30px rgba(157, 0, 255, 0.7);
+  border: 1px solid #9d00ff;
+}
+
+[data-theme="neon"] .settings-btn,
+[data-theme="neon"] .theme-btn {
+  border: 1px solid rgba(157, 0, 255, 0.2);
+  box-shadow: 0 0 10px rgba(157, 0, 255, 0.1);
+  transition: all 0.3s ease;
+}
+[data-theme="neon"] .settings-btn:hover,
+[data-theme="neon"] .theme-btn:hover {
+  box-shadow: 0 0 30px rgba(157, 0, 255, 0.8), 0 0 15px #ff007f;
+  border-color: #9d00ff;
+  color: #fff;
+  text-shadow: 0 0 10px #fff;
+}
+
+[data-theme="neon"] .save-btn, [data-theme="neon"] .primary-btn {
+  background: linear-gradient(135deg, #9d00ff, #ff007f);
+  box-shadow: 0 0 20px rgba(157, 0, 255, 0.5);
+  border: 1px solid #ff007f;
+  transition: all 0.3s ease;
+}
+[data-theme="neon"] .save-btn:hover, [data-theme="neon"] .primary-btn:hover {
+  box-shadow: 0 0 50px rgba(157, 0, 255, 0.9), 0 0 80px rgba(255, 0, 127, 0.6);
+  border-color: #fff;
+  text-shadow: 0 0 10px #fff;
+}
+
+[data-theme="neon"] .heatmap-cell[data-level="1"] { background: #200040; box-shadow: 0 0 5px rgba(157, 0, 255, 0.2); }
+[data-theme="neon"] .heatmap-cell[data-level="2"] { background: #6000c0; box-shadow: 0 0 10px rgba(157, 0, 255, 0.5); }
+[data-theme="neon"] .heatmap-cell[data-level="3"] { background: #9d00ff; box-shadow: 0 0 20px rgba(157, 0, 255, 0.8); }
+[data-theme="neon"] .heatmap-cell[data-level="4"] { background: #ff007f; box-shadow: 0 0 30px rgba(255, 0, 127, 1); }
+
+/* Custom Layout for Neon Theme */
+[data-theme="neon"] #home-section {
+  display: flex;
+  flex-direction: column;
+}
+[data-theme="neon"] .widgets-grid {
+  order: 1;
+}
+[data-theme="neon"] #ratings-row {
+  order: 2;
+  margin-top: 10px;
+}
+
+/* Custom Scrollbar for Neon */
+[data-theme="neon"] ::-webkit-scrollbar-thumb {
+  background: rgba(157, 0, 255, 0.5);
+  box-shadow: 0 0 10px rgba(157, 0, 255, 0.8);
+  border-radius: 10px;
+}
+[data-theme="neon"] ::-webkit-scrollbar-thumb:hover {
+  background: #ff007f;
+  box-shadow: 0 0 20px #ff007f;
+}
+
 /* --- Reset --- */
 *, *::before, *::after {
   margin: 0;
@@ -4290,9 +4490,9 @@ cursor: pointer;
   width: 200px;
   height: 200px;
   border-radius: 50%;
-  background: #0f172a;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(0,0,0,0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  box-shadow: none;
+  border: none;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -4300,9 +4500,9 @@ cursor: pointer;
 }
 
 [data-theme="light"] .analog-lunar {
-  background: #0f172a;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), inset 0 0 20px rgba(0,0,0,0.8);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: transparent;
+  box-shadow: none;
+  border: none;
 }
 
 .analog-lunar .clock-face-container,
@@ -4357,11 +4557,9 @@ cursor: pointer;
 }
 
 .analog-lunar::after {
-  /* Starry overlay */
+  display: none !important;
+  /* Starry overlay removed as per user request */
   content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
   border-radius: 50%;
   background-image: 
     radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),

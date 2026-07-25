@@ -39,7 +39,7 @@ let profilePassword = null;
 let _themeManualOverride = false; // tracks if user manually toggled theme
 let _themeOverridePeriod = null;  // 'day' or 'night' — the period when user overrode
 
-const THEME_ORDER = ['dark', 'light', 'dracula', 'nord', 'monokai', 'solarized', 'gruvbox', 'catppuccin'];
+const THEME_ORDER = ['dark', 'light', 'dracula', 'nord', 'monokai', 'solarized', 'gruvbox', 'catppuccin', 'neon'];
 
 function initTheme() {
   // Load persisted manual override state
@@ -329,26 +329,41 @@ function updateLunarPhase(date) {
           <rect x="0" y="0" width="100" height="100" fill="white" />
           <path d="${shadowPath}" fill="black" />
         </mask>
+        
+        <!-- Ultra-Realistic Moon Texture Generator -->
+        <filter id="moonTexture">
+          <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="6" result="noise" />
+          <feColorMatrix type="matrix" values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0" in="noise" result="bumpMap" />
+          <feDiffuseLighting in="bumpMap" surfaceScale="3" diffuseConstant="1.1" result="lit" lighting-color="#ffffff">
+            <feDistantLight azimuth="135" elevation="45" />
+          </feDiffuseLighting>
+          <feBlend mode="multiply" in="SourceGraphic" in2="lit" result="textured" />
+          
+          <!-- Add subtle darker craters -->
+          <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 1 0 0 0  0 0 0 0.3 0" in="noise" result="darkCrater" />
+          <feBlend mode="multiply" in="textured" in2="darkCrater" />
+        </filter>
+
         <radialGradient id="moonGlow" cx="30%" cy="30%" r="70%">
-          <stop offset="0%" stop-color="#ffffff" />
-          <stop offset="30%" stop-color="#f8fafc" />
-          <stop offset="60%" stop-color="#cbd5e1" />
-          <stop offset="85%" stop-color="#64748b" />
-          <stop offset="100%" stop-color="#334155" />
+          <stop offset="0%" stop-color="#fffae6" />
+          <stop offset="20%" stop-color="#ffeb99" />
+          <stop offset="50%" stop-color="#ffc837" />
+          <stop offset="80%" stop-color="#ff8008" />
+          <stop offset="100%" stop-color="#cc3d00" />
         </radialGradient>
         <radialGradient id="innerShadow" cx="50%" cy="50%" r="50%">
           <stop offset="70%" stop-color="rgba(0,0,0,0)" />
-          <stop offset="100%" stop-color="rgba(0,0,0,0.8)" />
+          <stop offset="100%" stop-color="rgba(100,20,0,0.7)" />
         </radialGradient>
         <radialGradient id="highlight" cx="20%" cy="20%" r="50%">
-          <stop offset="0%" stop-color="rgba(255,255,255,0.6)" />
+          <stop offset="0%" stop-color="rgba(255,255,255,0.7)" />
           <stop offset="100%" stop-color="rgba(255,255,255,0)" />
         </radialGradient>
       </defs>
       
       <g mask="url(#phaseMask)">
-        <!-- Base moon -->
-        <circle cx="50" cy="50" r="50" fill="url(#moonGlow)" />
+        <!-- Base moon with realistic surface texture -->
+        <circle cx="50" cy="50" r="50" fill="url(#moonGlow)" filter="url(#moonTexture)" />
         
         <!-- Lunar Maria (dark seas) for 3D realism -->
         <path d="M 15 40 Q 30 20 45 40 T 25 65 Z" fill="rgba(0,0,0,0.12)" />
@@ -1829,12 +1844,29 @@ function initHeatmap() {
 // ─── Weather ────────────────────────────────────
 window._cachedWeather = null;
 
+function getMoonPhaseEmoji(date = new Date()) {
+  const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14, 0)).getTime();
+  const lunarMonth = 29.53058770576 * 24 * 60 * 60 * 1000;
+  let phase = ((date.getTime() - knownNewMoon) % lunarMonth) / lunarMonth;
+  if (phase < 0) phase += 1;
+  
+  if (phase < 0.03 || phase > 0.97) return '🌑'; // New Moon
+  if (phase < 0.22) return '🌒'; // Waxing Crescent
+  if (phase < 0.28) return '🌓'; // First Quarter
+  if (phase < 0.47) return '🌔'; // Waxing Gibbous
+  if (phase < 0.53) return '🌕'; // Full Moon
+  if (phase < 0.72) return '🌖'; // Waning Gibbous
+  if (phase < 0.78) return '🌗'; // Last Quarter
+  return '🌘'; // Waning Crescent
+}
+
 function getWeatherIcon(weatherCode, isDay) {
   // WMO Weather interpretation codes → emoji
   // https://open-meteo.com/en/docs
+  const moon = getMoonPhaseEmoji();
   const codeMap = {
-    0:  isDay ? '☀️' : '🌙',    // Clear sky
-    1:  isDay ? '🌤️' : '🌙',    // Mainly clear
+    0:  isDay ? '☀️' : moon,    // Clear sky
+    1:  isDay ? '🌤️' : moon,    // Mainly clear
     2:  isDay ? '⛅' : '☁️',     // Partly cloudy
     3:  '☁️',                     // Overcast
     45: '🌫️',                    // Fog
@@ -1862,7 +1894,7 @@ function getWeatherIcon(weatherCode, isDay) {
     96: '⛈️',                     // Thunderstorm with slight hail
     99: '⛈️',                     // Thunderstorm with heavy hail
   };
-  return codeMap[weatherCode] || (isDay ? '☀️' : '🌙');
+  return codeMap[weatherCode] || (isDay ? '☀️' : moon);
 }
 
 function getWeatherDescription(weatherCode) {
