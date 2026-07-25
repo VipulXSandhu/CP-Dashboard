@@ -6,9 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initBaseConverter();
   initTemplateManager();
   initJsonFormatter();
+  initSmartCoachModal();
 });
 
-// ─── SIDEBAR TOGGLE ──────────────────────────────────────────────────────────
+//  SIDEBAR TOGGLE 
 function initToolsSidebar() {
   const toggleBtn = document.getElementById('toggle-tools');
   const sidebar = document.getElementById('tools-sidebar');
@@ -25,7 +26,7 @@ function initToolsSidebar() {
   });
 }
 
-// ─── 1. TYPING WARMUP ────────────────────────────────────────────────────────
+//  1. TYPING WARMUP 
 function initTypingWarmup() {
   const snippets = [
     "for(int i = 0; i < n; i++) { cin >> a[i]; }",
@@ -125,7 +126,7 @@ function initTypingWarmup() {
   loadSnippet();
 }
 
-// ─── 2. BASE CONVERTER ───────────────────────────────────────────────────────
+//  2. BASE CONVERTER 
 function initBaseConverter() {
   const decInput = document.getElementById('base-dec');
   const binInput = document.getElementById('base-bin');
@@ -171,7 +172,7 @@ function initBaseConverter() {
   hexInput.addEventListener('input', (e) => updateFromHex(e.target.value));
 }
 
-// ─── 3. TEMPLATE MANAGER ─────────────────────────────────────────────────────
+//  3. TEMPLATE MANAGER 
 function initTemplateManager() {
   const select = document.getElementById('snippet-select');
   const textarea = document.getElementById('snippet-code');
@@ -203,7 +204,7 @@ function initTemplateManager() {
   });
 }
 
-// ─── 4. JSON FORMATTER ───────────────────────────────────────────────────────
+//  4. JSON FORMATTER 
 function initJsonFormatter() {
   const input = document.getElementById('json-input');
   const output = document.getElementById('json-output');
@@ -230,3 +231,42 @@ function initJsonFormatter() {
     }
   });
 }
+
+
+// SMART COACH MODAL
+function initSmartCoachModal() {
+  const openBtn = document.getElementById('open-coach-modal-btn');
+  const closeBtn = document.getElementById('coach-close');
+  const overlay = document.getElementById('coach-overlay');
+  
+  if(openBtn) {
+    openBtn.addEventListener('click', () => {
+      if(overlay) {
+        overlay.classList.add('active');
+        // Initialize analyzer if not done yet
+        if(typeof initAnalyzer === 'function') {
+          if(typeof loadFromStorage === 'function') {
+            loadFromStorage('userProfiles', (profiles) => {
+              initAnalyzer(profiles?.cf);
+            });
+          }
+        }
+      }
+    });
+  }
+  
+  if(closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      if(overlay) overlay.classList.remove('active');
+    });
+  }
+  
+  if(overlay) {
+    overlay.addEventListener('click', (e) => {
+      if(e.target === overlay) {
+        overlay.classList.remove('active');
+      }
+    });
+  }
+}
+

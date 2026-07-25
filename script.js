@@ -39,6 +39,8 @@ let profilePassword = null;
 let _themeManualOverride = false; // tracks if user manually toggled theme
 let _themeOverridePeriod = null;  // 'day' or 'night' — the period when user overrode
 
+const THEME_ORDER = ['dark', 'light', 'dracula', 'nord', 'monokai', 'solarized', 'gruvbox', 'catppuccin'];
+
 function initTheme() {
   // Load persisted manual override state
   loadFromStorage('themeManualOverride', (saved) => {
@@ -56,7 +58,9 @@ function initTheme() {
   
   document.getElementById('toggle-theme').addEventListener('click', () => {
     const currentTheme = document.body.getAttribute('data-theme') || 'dark';
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    const currentIndex = THEME_ORDER.indexOf(currentTheme);
+    const nextIndex = (currentIndex + 1) % THEME_ORDER.length;
+    const newTheme = THEME_ORDER[nextIndex];
     document.body.setAttribute('data-theme', newTheme);
     updateThemeIcon(newTheme);
     saveToStorage('theme', newTheme);
@@ -121,6 +125,9 @@ function updateThemeIcon(theme) {
     moon.style.display = 'block';
     sun.style.display = 'none';
   }
+  // Sync the theme dropdown if it exists
+  const themeSelect = document.getElementById('theme-select');
+  if (themeSelect) themeSelect.value = theme;
   if (typeof applyWallpaper === 'function') applyWallpaper();
 }
 
@@ -283,7 +290,8 @@ loadFromStorage('darkWallpaperStyle', (val) => {
 });
 
 function applyWallpaper() {
-  const isLight = document.body.getAttribute('data-theme') === 'light';
+  const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+  const isLight = currentTheme === 'light';
   const wallpaperSetting = isLight ? lightWallpaperStyle : darkWallpaperStyle;
   
   document.body.className = document.body.className.replace(/\bbg-static-\S+/g, '').trim();
@@ -1273,10 +1281,12 @@ function openSettings() {
   const anaStyleEl = document.getElementById('analog-clock-style');
   const lightWallEl = document.getElementById('light-wallpaper-style');
   const darkWallEl = document.getElementById('dark-wallpaper-style');
+  const themeSelectEl = document.getElementById('theme-select');
   if (digiStyleEl) digiStyleEl.value = digitalClockStyle;
   if (anaStyleEl) anaStyleEl.value = analogClockStyle;
   if (lightWallEl) lightWallEl.value = lightWallpaperStyle;
   if (darkWallEl) darkWallEl.value = darkWallpaperStyle;
+  if (themeSelectEl) themeSelectEl.value = document.body.getAttribute('data-theme') || 'dark';
   
   if (typeof syncCustomSelects === 'function') syncCustomSelects();
 
@@ -1367,6 +1377,19 @@ function saveProfiles() {
   if (darkWallEl) {
     darkWallpaperStyle = darkWallEl.value;
     saveToStorage('darkWallpaperStyle', darkWallpaperStyle);
+  }
+
+  // Save and apply selected theme
+  const themeSelectEl = document.getElementById('theme-select');
+  if (themeSelectEl) {
+    const newTheme = themeSelectEl.value;
+    document.body.setAttribute('data-theme', newTheme);
+    updateThemeIcon(newTheme);
+    saveToStorage('theme', newTheme);
+    // Mark as manual override
+    _themeManualOverride = true;
+    _themeOverridePeriod = _getCurrentPeriod();
+    saveToStorage('themeManualOverride', { active: true, period: _themeOverridePeriod });
   }
   
   if (typeof applyWallpaper === 'function') applyWallpaper();
@@ -2223,6 +2246,58 @@ function deleteShortcut(index) {
   }
 }
 
+function initGuidance() {
+  const tabGuidance = document.getElementById('tab-guidance');
+  const tabGuidanceText = document.getElementById('tab-guidance-text');
+  const homeSection = document.getElementById('home-section');
+  const exploreSection = document.getElementById('explore-section');
+  const internshipsSection = document.getElementById('internships-section');
+  const placementsSection = document.getElementById('placements-section');
+  const hackathonsSection = document.getElementById('hackathons-section');
+  const guidanceSection = document.getElementById('guidance-section');
+  
+  if (!tabGuidance || !homeSection || !guidanceSection) return;
+
+  tabGuidance.addEventListener('click', () => {
+    const isGuidanceActive = tabGuidance.classList.contains('active');
+    
+    if (isGuidanceActive) {
+      // Switch back to Home
+      tabGuidance.classList.remove('active');
+      tabGuidanceText.textContent = "Guidance";
+      guidanceSection.classList.add('hidden');
+      homeSection.classList.remove('hidden');
+      homeSection.style.animation = 'fadeInUp 0.3s ease-out';
+    } else {
+      // Deactivate other tabs
+      document.querySelectorAll('.explore-tab-btn').forEach(btn => btn.classList.remove('active'));
+      const tabExploreText = document.getElementById('tab-explore-text');
+      if (tabExploreText) tabExploreText.textContent = "Explore";
+      const tabInternshipsText = document.getElementById('tab-internships-text');
+      if (tabInternshipsText) tabInternshipsText.textContent = "Internships";
+      const tabPlacementsText = document.getElementById('tab-placements-text');
+      if (tabPlacementsText) tabPlacementsText.textContent = "Placements";
+      const tabHackathonsText = document.getElementById('tab-hackathons-text');
+      if (tabHackathonsText) tabHackathonsText.textContent = "Hackathons";
+      
+      // Activate Guidance
+      tabGuidance.classList.add('active');
+      tabGuidanceText.textContent = "Home";
+      
+      // Hide all other sections
+      homeSection.classList.add('hidden');
+      if(exploreSection) exploreSection.classList.add('hidden');
+      if(internshipsSection) internshipsSection.classList.add('hidden');
+      if(placementsSection) placementsSection.classList.add('hidden');
+      if(hackathonsSection) hackathonsSection.classList.add('hidden');
+      
+      // Show Guidance section
+      guidanceSection.classList.remove('hidden');
+      guidanceSection.style.animation = 'fadeInUp 0.3s ease-out';
+    }
+  });
+}
+
 function initShortcuts() {
   // Load saved shortcuts
   loadFromStorage('quickShortcuts', (saved) => {
@@ -2273,10 +2348,17 @@ function init() {
   initInternships();
   initPlacements();
   initHackathons();
+  initGuidance();
 
   // Evaluate dynamic profiles on load
   loadFromStorage('userProfiles', (profiles) => {
     evaluateDynamicProfiles(profiles || {});
+    
+    // Initialize Smart Coach
+    if (typeof initAnalyzer === 'function') {
+      initAnalyzer(profiles?.cf);
+    }
+    
     const hasAnyProfile = (profiles && (profiles.cf || profiles.lc || profiles.cc));
     if (!hasAnyProfile) {
       setTimeout(() => openSettings(), 500); // slight delay for smooth entrance
@@ -2473,8 +2555,10 @@ function initExplore() {
       // Switch to Explore
       tabExplore.classList.add('active');
       tabExploreText.textContent = "Home";
-      homeSection.classList.add('hidden');
-      exploreSection.classList.remove('hidden');
+        homeSection.classList.add('hidden');
+        if(document.getElementById('guidance-section')) document.getElementById('guidance-section').classList.add('hidden');
+        if(document.getElementById('tab-guidance')) { document.getElementById('tab-guidance').classList.remove('active'); document.getElementById('tab-guidance-text').textContent = "Guidance"; }
+        exploreSection.classList.remove('hidden');
       exploreSection.style.animation = 'fadeInUp 0.3s ease-out';
       
       if (!exploreLoaded) {
@@ -2866,8 +2950,10 @@ function initInternships() {
       // Switch to Internships
       tabInternships.classList.add('active');
       tabInternshipsText.textContent = "Home";
-      homeSection.classList.add('hidden');
-      internshipsSection.classList.remove('hidden');
+        homeSection.classList.add('hidden');
+        if(document.getElementById('guidance-section')) document.getElementById('guidance-section').classList.add('hidden');
+        if(document.getElementById('tab-guidance')) { document.getElementById('tab-guidance').classList.remove('active'); document.getElementById('tab-guidance-text').textContent = "Guidance"; }
+        internshipsSection.classList.remove('hidden');
       internshipsSection.style.animation = 'fadeInUp 0.3s ease-out';
       
       if (!internshipsLoaded) {
@@ -3275,8 +3361,10 @@ function initHackathons() {
     } else {
       tabHackathons.classList.add('active');
       tabHackathonsText.textContent = "Home";
-      homeSection.classList.add('hidden');
-      hackathonsSection.classList.remove('hidden');
+        homeSection.classList.add('hidden');
+        if(document.getElementById('guidance-section')) document.getElementById('guidance-section').classList.add('hidden');
+        if(document.getElementById('tab-guidance')) { document.getElementById('tab-guidance').classList.remove('active'); document.getElementById('tab-guidance-text').textContent = "Guidance"; }
+        hackathonsSection.classList.remove('hidden');
       hackathonsSection.style.animation = 'fadeInUp 0.3s ease-out';
       
       if (!hackathonsLoaded) {
@@ -3916,8 +4004,10 @@ function initPlacements() {
     } else {
       tabPlacements.classList.add('active');
       tabPlacementsText.textContent = "Home";
-      homeSection.classList.add('hidden');
-      placementsSection.classList.remove('hidden');
+        homeSection.classList.add('hidden');
+        if(document.getElementById('guidance-section')) document.getElementById('guidance-section').classList.add('hidden');
+        if(document.getElementById('tab-guidance')) { document.getElementById('tab-guidance').classList.remove('active'); document.getElementById('tab-guidance-text').textContent = "Guidance"; }
+        placementsSection.classList.remove('hidden');
       placementsSection.style.animation = 'fadeInUp 0.3s ease-out';
       
       if (!placementsLoaded) {
