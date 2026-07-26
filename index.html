@@ -139,6 +139,7 @@
               <option value="serpent">Serpent Roman</option>
               <option value="cubes">3D Floating Cubes</option>
               <option value="lunar">Celestial Lunar</option>
+              <option value="lunar-crescent">3D Crescent Moon</option>
             </select>
           </div>
         </div>
@@ -238,7 +239,19 @@
   <div class="modal-overlay" id="daily-reminder-overlay">
     <div class="modal" id="daily-reminder-modal" style="max-width: 450px;">
       <div class="modal-header">
-        <h2 class="modal-title">Daily Reminder 🎯</h2>
+        <h2 class="modal-title" style="display: flex; align-items: center; justify-content: center;">
+          Daily Reminder
+          <svg id="con" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="url(#clock-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 8px; filter: drop-shadow(0 0 8px var(--accent-purple));">
+            <defs>
+              <linearGradient id="clock-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="var(--accent-cyan, #00F2FE)" />
+                <stop offset="100%" stop-color="var(--accent-purple, #4FACFE)" />
+              </linearGradient>
+            </defs>
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </h2>
         <button class="modal-close" id="daily-reminder-close" title="Close">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -258,11 +271,17 @@
   </div>
   <!-- Coach Modal Overlay -->
   <div class="modal-overlay" id="coach-overlay" style="z-index: 2000;">
-    <div class="modal" id="coach-modal" style="width: 500px; max-width: 90%; background: var(--bg-card); border: 1px solid rgba(94, 234, 212, 0.3); border-radius: 12px; position: relative;">
+    <div class="modal" id="coach-modal" style="width: 500px; max-width: 90%; background: var(--bg-card); border: 1px solid var(--border-widget); border-radius: 12px; position: relative;">
       <div class="modal-header">
         <div class="heatmap-title-group" style="display: flex; align-items: center; gap: 12px;">
-          <div class="widget-icon" style="background: rgba(94, 234, 212, 0.1); color: #5eead4; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <div class="widget-icon" style="background: var(--border-widget); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#coach-grad-modal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 6px var(--accent-purple));">
+              <defs>
+                <linearGradient id="coach-grad-modal" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="var(--accent-cyan, #00F2FE)" />
+                  <stop offset="100%" stop-color="var(--accent-purple, #4FACFE)" />
+                </linearGradient>
+              </defs>
               <path d="M12 2v2"></path>
               <path d="M12 20v2"></path>
               <path d="M4.93 4.93l1.41 1.41"></path>
@@ -274,7 +293,7 @@
               <circle cx="12" cy="12" r="4"></circle>
             </svg>
           </div>
-          <h2 class="modal-title" style="margin: 0; display: flex; align-items: center; gap: 12px;">Smart AI Coach <span class="news-source badge" style="background: linear-gradient(135deg, #14b8a6, #0ea5e9);">BETA</span></h2>
+          <h2 class="modal-title" style="margin: 0; display: flex; align-items: center; gap: 12px;">Smart AI Coach <span class="news-source badge" style="background: var(--gradient-hero);">BETA</span></h2>
         </div>
         <button class="modal-close" id="coach-close" title="Close" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1003,10 +1022,18 @@
         <!-- 0. Smart Coach -->
         <div class="tool-widget">
           <h3 style="display: flex; align-items: center; gap: 8px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5eead4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="M4.93 4.93l1.41 1.41"></path><path d="M17.66 17.66l1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="M4.93 19.07l1.41-1.41"></path><path d="M17.66 6.34l1.41-1.41"></path><circle cx="12" cy="12" r="4"></circle></svg>
-            Smart AI Coach <span class="badge" style="background: linear-gradient(135deg, #14b8a6, #0ea5e9); border: none; padding: 2px 6px;">BETA</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="url(#coach-grad-side)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 6px var(--accent-purple));">
+              <defs>
+                <linearGradient id="coach-grad-side" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="var(--accent-cyan, #00F2FE)" />
+                  <stop offset="100%" stop-color="var(--accent-purple, #4FACFE)" />
+                </linearGradient>
+              </defs>
+              <path d="M12 2v2"></path><path d="M12 20v2"></path><path d="M4.93 4.93l1.41 1.41"></path><path d="M17.66 17.66l1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="M4.93 19.07l1.41-1.41"></path><path d="M17.66 6.34l1.41-1.41"></path><circle cx="12" cy="12" r="4"></circle>
+            </svg>
+            Smart AI Coach <span class="badge" style="background: var(--gradient-hero); border: none; padding: 2px 6px;">BETA</span>
           </h3>
-          <button id="open-coach-modal-btn" class="save-btn" style="width: 100%; background: linear-gradient(135deg, #14b8a6, #0ea5e9); border: none;">Launch Coach</button>
+          <button id="open-coach-modal-btn" class="save-btn" style="width: 100%;">Launch Coach</button>
         </div>
 
         <!-- 1. Typing Warmup -->
