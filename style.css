@@ -4799,6 +4799,7 @@ cursor: pointer;
     transform: none;
     width: 100%;
     margin-top: 15px;
+    order: 3;
   }
   .hero-top-bar {
     flex-wrap: wrap;
