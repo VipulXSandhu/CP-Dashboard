@@ -4764,3 +4764,43 @@ cursor: pointer;
   color: var(--text-primary) !important;
   font-weight: 600;
 }
+
+/* --- Responsive Top Tabs --- */
+.top-tabs-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  white-space: nowrap;
+}
+
+@media (max-width: 1050px) {
+  .top-tabs-container {
+    gap: 8px;
+  }
+  .explore-tab-btn {
+    padding: 8px 12px;
+  }
+  .explore-tab-btn span {
+    display: none;
+  }
+  .explore-tab-btn svg {
+    margin-right: 0 !important;
+  }
+}
+
+@media (max-width: 550px) {
+  .top-tabs-container {
+    position: static;
+    transform: none;
+    width: 100%;
+    margin-top: 15px;
+  }
+  .hero-top-bar {
+    flex-wrap: wrap;
+  }
+}
