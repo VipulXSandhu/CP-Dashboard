@@ -2095,7 +2095,7 @@ body.bg-static-cyberpunk {
 }
 
 .search-submit-btn:hover {
-  background: var(--accent-blue);
+  background: var(--gradient-hero);
   color: white;
   transform: scale(1.08);
 }
@@ -3730,7 +3730,7 @@ select.form-input option {
 }
 
 .chat-msg.user {
-  background: var(--accent-blue);
+  background: var(--gradient-hero);
   color: white;
   align-self: flex-end;
   border-bottom-right-radius: 4px;
@@ -4715,7 +4715,7 @@ cursor: pointer;
   border-color: var(--accent-blue);
 }
 .badge {
-  background: var(--accent-blue);
+  background: var(--gradient-hero);
   color: white;
   padding: 2px 8px;
   border-radius: 12px;
@@ -4745,4 +4745,18 @@ cursor: pointer;
     width: 100%;
     right: -100%;
   }
+}
+
+/* --- Settings Redesign --- */
+.settings-tab {
+  transition: all 0.2s ease;
+}
+.settings-tab:hover:not(.active) {
+  background: var(--bg-card);
+  color: var(--text-primary) !important;
+}
+.settings-tab.active {
+  background: var(--bg-card-hover) !important;
+  color: var(--text-primary) !important;
+  font-weight: 600;
 }

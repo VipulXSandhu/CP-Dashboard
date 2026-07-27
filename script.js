@@ -387,6 +387,60 @@ function updateLunarPhase(date) {
   `;
 }
 
+function updateNormalMoon() {
+  const container = document.getElementById('moon-container');
+  if (!container) return;
+  
+  container.innerHTML = `
+    <svg viewBox="0 0 100 100" width="100%" height="100%" style="border-radius: 50%; filter: drop-shadow(0px 4px 12px rgba(255, 140, 0, 0.4));">
+      <defs>
+        <!-- Mask for crescent shape -->
+        <mask id="crescentMask">
+          <rect x="0" y="0" width="100" height="100" fill="white" />
+          <circle cx="25" cy="35" r="48" fill="black" />
+        </mask>
+
+        <!-- Main body golden gradient -->
+        <radialGradient id="crescentGlow" cx="40%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#fffae6" />
+          <stop offset="20%" stop-color="#ffe270" />
+          <stop offset="60%" stop-color="#ffaa00" />
+          <stop offset="85%" stop-color="#e66e00" />
+          <stop offset="100%" stop-color="#b34700" />
+        </radialGradient>
+
+        <!-- Crater depth gradient -->
+        <linearGradient id="craterIndent" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="rgba(150, 40, 0, 0.85)" />
+          <stop offset="50%" stop-color="rgba(255, 120, 0, 0.3)" />
+          <stop offset="100%" stop-color="rgba(255, 230, 100, 0.7)" />
+        </linearGradient>
+        
+        <!-- Very soft bright highlight for 3D edge -->
+        <radialGradient id="edgeHighlight" cx="30%" cy="30%" r="60%">
+          <stop offset="0%" stop-color="rgba(255, 255, 255, 0.7)" />
+          <stop offset="50%" stop-color="rgba(255, 255, 255, 0)" />
+        </radialGradient>
+      </defs>
+      
+      <g mask="url(#crescentMask)">
+        <!-- Base moon -->
+        <circle cx="50" cy="50" r="45" fill="url(#crescentGlow)" />
+        
+        <!-- Craters -->
+        <circle cx="68" cy="40" r="5" fill="url(#craterIndent)" />
+        <circle cx="78" cy="62" r="8" fill="url(#craterIndent)" />
+        <circle cx="52" cy="78" r="6" fill="url(#craterIndent)" />
+        <circle cx="85" cy="45" r="3" fill="url(#craterIndent)" />
+        <circle cx="62" cy="85" r="3.5" fill="url(#craterIndent)" />
+        
+        <!-- Soft highlight overlay -->
+        <circle cx="50" cy="50" r="45" fill="url(#edgeHighlight)" mix-blend-mode="overlay" />
+      </g>
+    </svg>
+  `;
+}
+
 function updateClock() {
   const now = new Date();
   
@@ -435,8 +489,12 @@ function updateClock() {
   }
 
   // Lunar Phase Logic
-  if (isAnalogClock && analogClockStyle === 'lunar') {
-    updateLunarPhase(now);
+  if (isAnalogClock && (analogClockStyle === 'lunar' || analogClockStyle === 'lunar-crescent')) {
+    if (analogClockStyle === 'lunar-crescent') {
+      updateNormalMoon();
+    } else {
+      updateLunarPhase(now);
+    }
     const ldt = document.getElementById('lunar-digital-time');
     if (ldt) ldt.textContent = `${hours}:${minutes}`;
   }
@@ -4249,4 +4307,29 @@ async function fetchPlacements(forceRefresh = false, append = false, page = 1) {
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(initCustomSelects, 100);
 });
-initCustomSelects();
+initCustomSelects();
+// --- Settings UI Tabs ---
+document.querySelectorAll('.settings-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    // Remove active class from all tabs
+    document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+    // Add active class to clicked tab
+    tab.classList.add('active');
+    
+    // Hide all panes
+    document.querySelectorAll('.settings-pane').forEach(p => {
+      p.classList.remove('active');
+      p.style.display = 'none';
+    });
+    
+    // Show target pane
+    const targetId = tab.getAttribute('data-pane');
+    if (targetId) {
+      const pane = document.getElementById(targetId);
+      if (pane) {
+        pane.classList.add('active');
+        pane.style.display = 'block';
+      }
+    }
+  });
+});
