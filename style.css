@@ -3085,6 +3085,10 @@ body.bg-static-cyberpunk {
   gap: 10px;
 }
 
+.links-widget .widget-body {
+  overflow: visible;
+}
+
 .quick-link {
   display: flex;
   flex-direction: column;
